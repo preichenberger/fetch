@@ -6,7 +6,9 @@
     "coffee-script": "*",
     "fluent-ffmpeg": "*",
     "hapi": "*",
-    "pluralize": "*"
+    "pluralize": "*",
+    "request": "*",
+    "watson-developer-cloud": "*"
   },
   "scripts": {
     "start": "coffee index.coffee"
