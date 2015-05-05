@@ -71,22 +71,28 @@ build = (item, callback) ->
         return cb(null, labels)
       )
    news: (cb) ->
-    key = alchemyapi.key
+    key = alchemyapi.apikey
     opts =
       method: 'GET'
-      uri: "http://dbpedia.org/data/#{path.basename(item.dbpedia)}.json"
+      uri: 'https://access.alchemyapi.com/calls/data/GetNews'
       json: true
       qs:
+        apikey: key
         outputMode: 'json'
         start: 'now-1d'
         end: 'now'
         maxResults: 50
-        return: 'enriched.url.title, enriched.url.text, enriched.url.image'
+        'q.enriched.url.title': i.text
+        return: 'enriched.url.title,enriched.url.text,enriched.url.image,enriched.url.url'
 
     request(opts, (err, response, body) ->
+      if err
+        return cb(null, []) 
+
       if response.statusCode != 200
-        return cb(errors.New('Invalid status code'))
-  
+        return cb(null, [])
+
+      return cb(null, body.result.docs)
     )
   },
   (err, results) ->
@@ -99,6 +105,18 @@ build = (item, callback) ->
         url: l.result.link
 
       i.content.push(c)
+
+    if results['news']
+      for v in results['news']
+        l = v.source.enriched.url
+        c =
+          headline: l.title
+          type: 'news'
+          image_url: l.image
+          url: l.url
+
+        if c.image_url
+          i.content.push(c)
 
     return callback(null, i)
   )
@@ -140,7 +158,10 @@ prepare = (data, callback) ->
       #return callback(null, [])
       async.map(data['concepts'], build, callback)
     insights: (callback) ->
-      i = [data['insights'][0]]
+      if data['insights'].length > 0
+        i = [data['insights'][0]]
+      else
+        i = data['insights']
       async.map(i, build, callback)
 
   },
