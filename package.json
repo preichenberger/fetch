@@ -1,0 +1,14 @@
+{
+  "name": "realtime",
+  "dependencies": {
+    "async": "*",
+    "cfenv": "1.0.x",
+    "coffee-script": "*",
+    "fluent-ffmpeg": "*",
+    "hapi": "*",
+    "pluralize": "*"
+  },
+  "scripts": {
+    "start": "coffee index.coffee"
+  }
+}
